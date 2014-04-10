@@ -9,29 +9,25 @@ and open the template in the editor.
         <meta charset="UTF-8">
         <title>JSON en AJAX</title>
         <script src="json2.js"></script>
-        <script src="data.json" type="text/javascript"></script>
     </head>
     <body>
+      
         <script>
-            var oData = {};
-
             window.onload = function() {
                 var eSubmit = document.getElementsByTagName('button')[0];
-                eSubmit.addEventListener("click",function(e) {
-                    loadData("ajaxhandler.php");
+                eSubmit.addEventListener("click", function() {
+                    window.location.href="ajaxhandler.php?q=string";
+                   loadData()"ajaxhandler.php?q=string");
                 });
-                oData = JSON.parse(jsonData);
             }
-
-
-
             function loadData(url) {
                 var xmlhttp = createXhrObject();
                 xmlhttp.onreadystatechange = function()
                 {
                     if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
                     {
-                       console.log(xmlhttp.responseText);
+                        var eMyDiv = document.getElementById('myDiv');
+                        eMyDiv.innerHTML = xmlhttp.responseText
                     }
                 }
                 xmlhttp.open("GET", url, true)
