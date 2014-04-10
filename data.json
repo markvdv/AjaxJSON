@@ -1,0 +1,2 @@
+var jsonData ='{"string":"hallo", "array": ["mark", "jan", "heiko"]}';
+
