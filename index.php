@@ -2,29 +2,24 @@
     <head>
         <title>Simple Ajax Example</title>
         <script language="Javascript">
-            window.onload=function(){
-              var eButton= document.getElementById("Go");
-              eButton.addEventListener('click',function(){xmlhttpPost("databaseController.php")});
+            window.onload = function() {
+                var eButton = document.getElementById("Go");
+                eButton.addEventListener('click', function() {
+                    xmlhttpPost("databaseController.php")
+                });
             };
             function xmlhttpPost(strURL) {
                 var xmlHttpReq = false;
-                var self = this;
                 // Mozilla/Safari
-                if (window.XMLHttpRequest) {
-                    self.xmlHttpReq = new XMLHttpRequest();
-                }
-                // IE
-                else if (window.ActiveXObject) {
-                    self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
-                }
-                self.xmlHttpReq.open('POST', strURL, true);
-                self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                self.xmlHttpReq.onreadystatechange = function() {
-                    if (self.xmlHttpReq.readyState == 4) {
-                        updatepage(self.xmlHttpReq.responseText);
+                var xmlhttp = createXhrObject();
+                xmlhttp.open('POST', strURL, true);
+                xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xmlhttp.onreadystatechange = function() {
+                    if (xmlhttp.readyState == 4) {
+                        updatepage(xmlhttp.responseText);
                     }
                 }
-                self.xmlHttpReq.send(getquerystring());
+                xmlhttp.send(getquerystring());
             }
 
             function getquerystring() {
@@ -37,12 +32,35 @@
             function updatepage(str) {
                 document.getElementById("result").innerHTML = str;
             }
+            function createXhrObject() {
+                //memoizing
+                var xmlhttp = '';
+                if (window.XMLHttpRequest) {
+                    xmlhttp = new XMLHttpRequest();
+                }
+                else if (window.ActiveXObject) {
+                    try {
+                        xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+                    }
+                    catch (e) {
+                        try {
+                            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                        }
+                        catch (e) {
+                        }
+                    }
+                }
+                this.createXhrObject = function() {
+                    return xmlhttp;
+                }
+                return xmlhttp;
+            }
         </script>
     </head>
     <body>
         <form name="f1">
             <p>word: <input name="word" type="text" >  
                 <input value="Go" id="Go" type="button" ></p>
- -->             </form>
+            <div id="result"></div>            </form>
     </body>
 </html>

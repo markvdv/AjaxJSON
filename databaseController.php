@@ -1,20 +1,29 @@
 <?php
-echo "<pre>";
-print_r($_POST);
-echo "</pre>";
-echo __LINE__ . "<br>" . __FILE__ . "<br>";
-$db=new PDO('mysql:dbname=pizzeria;host=localhost', 'root', '');
-$resultSet=$db->query("SELECT * FROM product");
-foreach ($resultSet as $result){
-    if($_POST['w']!=''){
-    if ($result['productomschrijving'][25]!==null&&$result['productomschrijving'][25]===$_POST['w']){
-    print($result['productomschrijving']."<br>");
-    }
-    }
-    else{
-         print($result['productomschrijving']."<br>");
-    }
+require_once 'Business/ProductService.class.php';
+$db = new PDO('mysql:dbname=pizzeria;host=localhost', 'root', '');
+$resultSet = $db->query("SELECT * FROM product");
+
+// ophalen van voorbeeld gegevens
+$productenlijst=ProductService::toonProducten();
+$json='';
+foreach ($productenlijst as $product){
+    $json.= json_encode($product,JSON_PRETTY_PRINT);
 }
 
+/*foreach ($resultSet as $result) {
+    if ($_POST['w'] != '') {
+        if ($result['productomschrijving'][0] === $_POST['w']) {
+            print($result['productomschrijving'] . "<br>");
+           
+            
+            
+            
+            $json=json_encode(array("test"=>$result['productomschrijving']));
+        }
+    } else {
+        print($result['productomschrijving'] . "<br>");
+    }
+}*/
 
+print("JSON".$json);
 print('AJAX succes');
