@@ -1,29 +1,22 @@
 <?php
+
 require_once 'Business/ProductService.class.php';
-$db = new PDO('mysql:dbname=pizzeria;host=localhost', 'root', '');
-$resultSet = $db->query("SELECT * FROM product");
 
-// ophalen van voorbeeld gegevens
-$productenlijst=ProductService::toonProducten();
-$json='';
-foreach ($productenlijst as $product){
-    $json.= json_encode($product,JSON_PRETTY_PRINT);
+// ophalen van voorbeeld gegevensobjecten
+$productenlijst = ProductService::toonProducten();
+
+//omzetten van gegevensobjecten naar een jsonstring
+$json = '{"producten":[';
+foreach ($productenlijst as $product) {
+    $json.= json_encode($product) . ',';
 }
+$json = rtrim($json, ',');
 
-/*foreach ($resultSet as $result) {
-    if ($_POST['w'] != '') {
-        if ($result['productomschrijving'][0] === $_POST['w']) {
-            print($result['productomschrijving'] . "<br>");
-           
-            
-            
-            
-            $json=json_encode(array("test"=>$result['productomschrijving']));
-        }
-    } else {
-        print($result['productomschrijving'] . "<br>");
-    }
-}*/
+//test adding functions for sorting
+$json.='],"functies": [1,2,3,4';
+$json.="]}";
 
-print("JSON".$json);
-print('AJAX succes');
+print($json);
+?>
+
+
