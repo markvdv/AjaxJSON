@@ -3,10 +3,15 @@
         <title>Simple Ajax Example</title>
         <script language="Javascript">
             window.onload = function() {
+                var eInput = document.getElementById("input");
+                eInput.addEventListener('keydown', function() {
+                    //    xmlhttpPost("databaseController.php")
+                    // console.log('change detected');
+                });
                 var eButton = document.getElementById("Go");
                 var eResult = document.getElementById('result')
                 eButton.addEventListener('click', function() {
-                    xmlhttpPost("databaseController.php")
+                    xmlhttpPost("databaseController.php");
                 });
             };
             function xmlhttpPost(strURL) {
@@ -17,8 +22,6 @@
                 xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xmlhttp.onreadystatechange = function() {
                     if (xmlhttp.readyState == 4) {
-
-
                         updatepage(xmlhttp);
                     }
                 }
@@ -33,47 +36,57 @@
 
             function updatepage(xmlhttp) {
                 //check of Json string goed doorkomt
-                var str = xmlhttp.responseText
-                document.getElementById("result").innerHTML = str;
+
 
                 //omzetten van JSON string naar Javascript objecten
                 var sJSON = xmlhttp.responseText;
+                document.getElementById("result").innerHTML = sJSON;
+                document.getElementById("result").innerHTML += '<br><br><br>';
+                
                 // console.log(sJSON);
                 //var oJsonParsed = JSON.parse(sJSON)
                 var oJsonParsed = JSON.parse(sJSON, reviver);
-                //   console.log(oJsonParsed);
                 var eTable = document.createElement('table');
                 eTable.border = "1px";
                 for (var i in oJsonParsed) {
+                    var eTr = document.createElement('tr');
                     for (var j in oJsonParsed[i]) {
-                        console.log(oJsonParsed[i][j])
-                        /* var eDiv= document.createElement("div");
-                         eDiv.innerHTML= oJsonParsed[i][j]['productId'];
-                         document.getElementById("result").appendChild(eDiv);*/
-                        var eTr = document.createElement('tr');
-
-                        for (var k in oJsonParsed[i][j]) {
-                            var eTd = document.createElement('td');
-                            var innerHTML = k + ": " + oJsonParsed[i][j][k];
-                            eTd.innerHTML = innerHTML;
-                            eTr.appendChild(eTd);
-                        }
-                        eTable.appendChild(eTr);
+                        var eTd = document.createElement('td');
+                        var innerHTML = j + ": " + oJsonParsed[i][j];
+                        eTd.innerHTML = innerHTML;
+                        eTr.appendChild(eTd);
                     }
+                    eTable.appendChild(eTr);
                     var eResult = document.getElementById('result');
                     eResult.appendChild(eTable);
                 }
             }
-            function reviver (key,value) {
-                    var sFuncties = '';
-                    console.log("key: " + key);
-                    console.log("value: " + value);
-                    console.log("\n");
-                    if (key === "functies") {
-                        sFuncties += value;
-                        alert(sFuncties);
+            function reviver(key, value) {
+                if (key == 'query') {
+                    var sQuery= new RegExp('value');
+                return null;
+                }
+                else{                   
+                 if (sQuery === 'undefined') {
+                        console.log('Reviving ' + key + ' ' + value);
+                        return value;
+                    } else if(sQuery!=='undefined'){
+                        if (sQuery.test(value)) {
+                            return value;
+                        }
+                        else if(!sQuery.test(value)){
+                            return null;
+                        }
                     }
                 }
+            }
+            function loadSuggestions() {
+                /*   var eDataList = document.getElementById('suggestions');
+                 var eOption = document.createElement('option');
+                 eOption.id = value;
+                 eOption.innerHTML = value;
+                 eDataList.appendChild(eOption);*/
+            }
             function createXhrObject() {
                 //memoizing
                 var xmlhttp = '';
@@ -101,8 +114,12 @@
     </head>
     <body>
         <form name="f1">
-            <p>word: <input name="word" type="text" >  
+            <p>word: <input id='input' name="word" type="text" >  
                 <input value="Go" id="Go" type="button" ></p>
-            <div id="result"></div>            </form>
+            <datalist id='suggestions'>
+
+            </datalist>
+        </form>
+        <div id="result"></div>           
     </body>
 </html>

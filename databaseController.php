@@ -5,16 +5,28 @@ require_once 'Business/ProductService.class.php';
 // ophalen van voorbeeld gegevensobjecten
 $productenlijst = ProductService::toonProducten();
 
-//omzetten van gegevensobjecten naar een jsonstring
-$json = '{"producten":[';
-foreach ($productenlijst as $product) {
-    $json.= json_encode($product) . ',';
-}
-$json = rtrim($json, ',');
 
-//test adding functions for sorting
-$json.='],"functies": [1,2,3,4';
-$json.="]}";
+if ($_POST['w'] != '') {
+    $productenlijst= array_reverse($productenlijst);
+    $productenlijst['query']=$_POST['w'];
+    $productenlijst= array_reverse($productenlijst);
+}
+    $json = json_encode($productenlijst);
+//omzetten van gegevensobjecten naar een jsonstring
+//$json = '{"queryParam":"'.$_POST['w'].'","producten":[';
+/* foreach ($productenlijst as $product) {
+
+  /*if (isset($_POST['w'])&&$_POST['w']!='') {
+  $param= "/".$_POST['w']."/";
+  if (preg_match(strtolower($param), strtolower($product->getProductNaam()))){
+  $json.= json_encode($product) . ',';
+  }
+  } else {
+  // $json.= json_encode($product) . ',';
+  //}
+  }
+ */
+
 
 print($json);
 ?>
