@@ -1,31 +1,32 @@
 <html>
     <head>
         <title>Simple Ajax Example</title>
+        <style>
+            option{
+                display:block;
+            }
+            datalist{
+                display:block;
+            }
+        </style>
         <script language="Javascript">
             window.onload = function() {
+                var sQuery = '';
                 var eInput = document.getElementById("input");
                 eInput.addEventListener('keyup', function() {
-                    //xmlhttpPost("databaseController.php")
-                    // console.log('change detected');
+        var eDataList= document.getElementById('suggestions');            
+                    xmlhttpPost("databaseController.php", true)
+                    console.log('change detected');
                 });
                 var eButton = document.getElementById("Go");
                 var eResult = document.getElementById('result');
                 eButton.addEventListener('click', function() {
-                    xmlhttpPost("databaseController.php");
+                    xmlhttpPost("databaseController.php", false);
                 });
-
             };
-            function xmlhttpPost(strURL) {
-                var xmlHttpReq = false;
+            function xmlhttpPost(strURL, bool) {
                 // Mozilla/Safari
                 var xmlhttp = createXhrObject();
-                xmlhttp.open('POST', strURL, true);
-                xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xmlhttp.onreadystatechange = function() {
-                    if (xmlhttp.readyState == 4) {
-                        updatepage(xmlhttp);
-                    }
-                }
                 var eInput = document.getElementById('input');
                 if (eInput.getAttribute("value") !== '') {
                     var sValue = eInput.value
@@ -33,16 +34,25 @@
                 else {
                     var sValue = '';
                 }
+                xmlhttp.open('POST', strURL, true);
+                xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xmlhttp.onreadystatechange = function() {
+                    if (xmlhttp.readyState == 4) {
+                        if (bool === false) {
+                            updatepage(xmlhttp);
+                        }
+                        else {
+                            loadSuggestions(xmlhttp);
+                        }
+                    }
+                }
                 xmlhttp.send("w=" + sValue);
             }
             function updatepage(xmlhttp) {
                 //omzetten van JSON string naar Javascript objecten
                 var sJSON = xmlhttp.responseText;
                 var oJsonParsed = JSON.parse(sJSON, reviver);
-
-                //opmmaak
                 var eRegExp = oJsonParsed['query'];
-                var innerHTML = '';
 
                 var eResult = document.getElementById('result')
                 eResult.innerHTML = '';
@@ -68,12 +78,23 @@
                     return value;
                 }
             }
-            function loadSuggestions() {
-                /*   var eDataList = document.getElementById('suggestions');
-                 var eOption = document.createElement('option');
-                 eOption.id = value;
-                 eOption.innerHTML = value;
-                 eDataList.appendChild(eOption);*/
+
+
+            function loadSuggestions(xmlhttp) {
+                var eDataList = document.getElementById('suggestions');
+                var sJSON = xmlhttp.responseText;
+                var oJsonParsed = JSON.parse(sJSON, reviver);
+                var eRegExp = oJsonParsed['query'];
+                var eOption = document.createElement('option');
+                for (var i in oJsonParsed) {
+                    for (var j in oJsonParsed[i]) {
+                        if (eRegExp.test(oJsonParsed[i][j]) === true) {
+                            eOption.id = oJsonParsed[i][j];
+                            eOption.innerHTML = oJsonParsed[i][j];
+                            eDataList.appendChild(eOption);
+                        }
+                    }
+                }
             }
             function createXhrObject() {
                 //memoizing
@@ -104,9 +125,9 @@
         <form name="f1">
             <p>word: <input id='input' name="word" type="text" >  
                 <input value="Go" id="Go" type="button" ></p>
-            <datalist id='suggestions'>
+            <select id='suggestions' size="4">
 
-            </datalist>
+            </select>
         </form>
         <div id="result"></div>           
     </body>

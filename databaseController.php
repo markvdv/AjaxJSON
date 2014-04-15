@@ -7,9 +7,7 @@ $productenlijst = ProductService::toonProducten();
 
 
  if ($_POST['w'] != '') {
-  $productenlijst= array_reverse($productenlijst);
   $productenlijst['query']=$_POST['w'];
-  $productenlijst= array_reverse($productenlijst);
   }
   $json = json_encode($productenlijst); 
 //omzetten van gegevensobjecten naar een jsonstring
@@ -25,9 +23,6 @@ foreach ($productenlijst as $product) {
         $json.= json_encode($product) . ',';
     }
 }*/
-
-
-
 print($json);
 ?>
 
