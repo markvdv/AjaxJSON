@@ -4,15 +4,16 @@
         <script language="Javascript">
             window.onload = function() {
                 var eInput = document.getElementById("input");
-                eInput.addEventListener('keydown', function() {
-                    //    xmlhttpPost("databaseController.php")
+                eInput.addEventListener('keyup', function() {
+                    //xmlhttpPost("databaseController.php")
                     // console.log('change detected');
                 });
                 var eButton = document.getElementById("Go");
-                var eResult = document.getElementById('result')
+                var eResult = document.getElementById('result');
                 eButton.addEventListener('click', function() {
                     xmlhttpPost("databaseController.php");
                 });
+
             };
             function xmlhttpPost(strURL) {
                 var xmlHttpReq = false;
@@ -25,59 +26,46 @@
                         updatepage(xmlhttp);
                     }
                 }
-                xmlhttp.send(getquerystring());
+                var eInput = document.getElementById('input');
+                if (eInput.getAttribute("value") !== '') {
+                    var sValue = eInput.value
+                }
+                else {
+                    var sValue = '';
+                }
+                xmlhttp.send("w=" + sValue);
             }
-            function getquerystring() {
-                var form = document.forms['f1'];
-                var word = form.word.value;
-                qstr = 'w=' + escape(word);  // NOTE: no '?' before querystring
-                return qstr;
-            }
-
             function updatepage(xmlhttp) {
-                //check of Json string goed doorkomt
-
-
                 //omzetten van JSON string naar Javascript objecten
                 var sJSON = xmlhttp.responseText;
-                document.getElementById("result").innerHTML = sJSON;
-                document.getElementById("result").innerHTML += '<br><br><br>';
-                
-                // console.log(sJSON);
-                //var oJsonParsed = JSON.parse(sJSON)
                 var oJsonParsed = JSON.parse(sJSON, reviver);
-                var eTable = document.createElement('table');
-                eTable.border = "1px";
+
+                //opmmaak
+                var eRegExp = oJsonParsed['query'];
+                var innerHTML = '';
+
+                var eResult = document.getElementById('result')
+                eResult.innerHTML = '';
                 for (var i in oJsonParsed) {
-                    var eTr = document.createElement('tr');
                     for (var j in oJsonParsed[i]) {
-                        var eTd = document.createElement('td');
-                        var innerHTML = j + ": " + oJsonParsed[i][j];
-                        eTd.innerHTML = innerHTML;
-                        eTr.appendChild(eTd);
+                        if (typeof eRegExp === 'undefined') {
+                            eResult.innerHTML += oJsonParsed[i][j] + "<br>";
+                        }
+                        else {
+                            if (eRegExp.test(oJsonParsed[i][j]) === true) {
+                                eResult.innerHTML += oJsonParsed[i][j] + "<br>";
+                            }
+                        }
                     }
-                    eTable.appendChild(eTr);
-                    var eResult = document.getElementById('result');
-                    eResult.appendChild(eTable);
                 }
             }
             function reviver(key, value) {
-                if (key == 'query') {
-                    var sQuery= new RegExp('value');
-                return null;
+                if (key === "query") {
+                    var eRegExp = new RegExp(value, 'i');
+                    return eRegExp;
                 }
-                else{                   
-                 if (sQuery === 'undefined') {
-                        console.log('Reviving ' + key + ' ' + value);
-                        return value;
-                    } else if(sQuery!=='undefined'){
-                        if (sQuery.test(value)) {
-                            return value;
-                        }
-                        else if(!sQuery.test(value)){
-                            return null;
-                        }
-                    }
+                else {
+                    return value;
                 }
             }
             function loadSuggestions() {
