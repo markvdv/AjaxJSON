@@ -5,24 +5,28 @@
             option{
                 display:block;
             }
-            datalist{
-                display:block;
+            #suggestions{
+                display:none;
             }
         </style>
         <script language="Javascript">
             window.onload = function() {
-                var sQuery = '';
-                var eInput = document.getElementById("input");
-                eInput.addEventListener('keyup', function() {
-        var eDataList= document.getElementById('suggestions');            
-                    xmlhttpPost("databaseController.php", true)
-                    console.log('change detected');
-                });
-                var eButton = document.getElementById("Go");
-                var eResult = document.getElementById('result');
+                //REFERENTIES NAAR ELEMENTEN
+                var eInput = document.getElementById("input"),
+                        eButton = document.getElementById("Go"),
+                        eDataList = document.getElementById('suggestions');
+                //EVENTLISTENERS
                 eButton.addEventListener('click', function() {
                     xmlhttpPost("databaseController.php", false);
+                    eDataList.innerHTML='';
+                    eDataList.size=0;
+                    eDataList.style.display="none";
                 });
+                eInput.addEventListener('keydown', function() {
+                    xmlhttpPost("databaseController.php", true)
+                });
+                //EINDE ONLOAD
+
             };
             function xmlhttpPost(strURL, bool) {
                 // Mozilla/Safari
@@ -88,13 +92,20 @@
                 var eOption = document.createElement('option');
                 for (var i in oJsonParsed) {
                     for (var j in oJsonParsed[i]) {
-                        if (eRegExp.test(oJsonParsed[i][j]) === true) {
+                        if (typeof eRegExp!=="undefined"&& eRegExp.test(oJsonParsed[i][j]) === true) {
+                            for (var k in eDataList.children) {
+                                if (eDataList.children[k].id === oJsonParsed[i][j]) {
+                                    return false;
+                                }
+                            }
                             eOption.id = oJsonParsed[i][j];
                             eOption.innerHTML = oJsonParsed[i][j];
                             eDataList.appendChild(eOption);
                         }
                     }
                 }
+                eDataList.size+=1;
+                eDataList.style.display= "block";
             }
             function createXhrObject() {
                 //memoizing
@@ -111,6 +122,7 @@
                             xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
                         }
                         catch (e) {
+                            console.error('cant create XMLHttpRequest')
                         }
                     }
                 }
@@ -125,7 +137,7 @@
         <form name="f1">
             <p>word: <input id='input' name="word" type="text" >  
                 <input value="Go" id="Go" type="button" ></p>
-            <select id='suggestions' size="4">
+            <select id='suggestions' >
 
             </select>
         </form>

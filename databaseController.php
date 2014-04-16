@@ -10,6 +10,9 @@ $productenlijst = ProductService::toonProducten();
   $productenlijst['query']=$_POST['w'];
   }
   $json = json_encode($productenlijst); 
+  
+  
+  
 //omzetten van gegevensobjecten naar een jsonstring
 /*$json = '{"queryParam":"' . $_POST['w'] . '","producten":[';
 foreach ($productenlijst as $product) {
