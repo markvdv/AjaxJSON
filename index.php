@@ -17,17 +17,24 @@
                         eDataList = document.getElementById('suggestions');
                 //EVENTLISTENERS
                 eButton.addEventListener('click', function() {
+                    eDataList.innerHTML = '';
+                    eDataList.size = 0;
+                    eDataList.style.display = "none";
                     xmlhttpPost("databaseController.php", false);
-                    eDataList.innerHTML='';
-                    eDataList.size=0;
-                    eDataList.style.display="none";
                 });
-                eInput.addEventListener('keydown', function() {
+                eInput.addEventListener('keydown', function(e) {
                     xmlhttpPost("databaseController.php", true)
+
                 });
                 //EINDE ONLOAD
 
             };
+            /**xmlhttpPost: gets the object to do the request and handles the update of the page or select list
+             * 
+             * @param {type} key
+             * @param {type} value
+             * @returns {RegExp}
+             */
             function xmlhttpPost(strURL, bool) {
                 // Mozilla/Safari
                 var xmlhttp = createXhrObject();
@@ -42,37 +49,22 @@
                 xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xmlhttp.onreadystatechange = function() {
                     if (xmlhttp.readyState == 4) {
+                        var sJSON = xmlhttp.responseText,
+                                oJsonParsed = JSON.parse(sJSON, reviver);
                         if (bool === false) {
-                            updatepage(xmlhttp);
+                            updatepage(oJsonParsed);
                         }
                         else {
-                            loadSuggestions(xmlhttp);
+                            loadSuggestions(oJsonParsed);
                         }
                     }
                 }
                 xmlhttp.send("w=" + sValue);
             }
-            function updatepage(xmlhttp) {
-                //omzetten van JSON string naar Javascript objecten
-                var sJSON = xmlhttp.responseText;
-                var oJsonParsed = JSON.parse(sJSON, reviver);
-                var eRegExp = oJsonParsed['query'];
-
-                var eResult = document.getElementById('result')
-                eResult.innerHTML = '';
-                for (var i in oJsonParsed) {
-                    for (var j in oJsonParsed[i]) {
-                        if (typeof eRegExp === 'undefined') {
-                            eResult.innerHTML += oJsonParsed[i][j] + "<br>";
-                        }
-                        else {
-                            if (eRegExp.test(oJsonParsed[i][j]) === true) {
-                                eResult.innerHTML += oJsonParsed[i][j] + "<br>";
-                            }
-                        }
-                    }
-                }
-            }
+            /**reviver: function to get the queryparam out and make it a regexp when parsing JSON
+             * 
+             * @type @exp;oJsonParsed@pro;query
+             */
             function reviver(key, value) {
                 if (key === "query") {
                     var eRegExp = new RegExp(value, 'i');
@@ -82,31 +74,71 @@
                     return value;
                 }
             }
-
-
-            function loadSuggestions(xmlhttp) {
-                var eDataList = document.getElementById('suggestions');
-                var sJSON = xmlhttp.responseText;
-                var oJsonParsed = JSON.parse(sJSON, reviver);
-                var eRegExp = oJsonParsed['query'];
-                var eOption = document.createElement('option');
+            /**updatepage: updates the page accordingly
+             * 
+             * @param {type} xmlhttp: XmlHttpRequest/ActiveXobject
+             * @returns {Boolean}
+             */
+            function updatepage(oJsonParsed) {
+                //referenties
+                var eRegExp = oJsonParsed['query'],
+                        eResult = document.getElementById('result');
+                eResult.innerHTML = '';
                 for (var i in oJsonParsed) {
                     for (var j in oJsonParsed[i]) {
-                        if (typeof eRegExp!=="undefined"&& eRegExp.test(oJsonParsed[i][j]) === true) {
-                            for (var k in eDataList.children) {
-                                if (eDataList.children[k].id === oJsonParsed[i][j]) {
-                                    return false;
+                        if (j === "productNaam") {
+                            if (typeof eRegExp === 'undefined') {
+                                eResult.innerHTML += oJsonParsed[i][j] + "<br>";
+                            }
+                            else {
+                                if (eRegExp.test(oJsonParsed[i][j]) === true) {
+                                    eResult.innerHTML += oJsonParsed[i][j] + "<br>";
                                 }
                             }
-                            eOption.id = oJsonParsed[i][j];
-                            eOption.innerHTML = oJsonParsed[i][j];
-                            eDataList.appendChild(eOption);
                         }
                     }
                 }
-                eDataList.size+=1;
-                eDataList.style.display= "block";
             }
+
+
+            /**loadSuggestions: loads the suggestions into the select dropdown below the input field
+             * 
+             * @returns {ActiveXObject|XMLHttpRequest|String}
+             */
+            function loadSuggestions(oJsonParsed) {
+                var eDataList = document.getElementById('suggestions'),
+                        eRegExp = oJsonParsed['query'],
+                        eOption = document.createElement('option');
+                for (var i in oJsonParsed) {
+                    for (var j in oJsonParsed[i]) {
+                        alert(i);
+                        alert(j);
+                        if (j === "productNaam") {
+                            if (typeof eRegExp !== "undefined" && eRegExp.test(oJsonParsed[i][j]) === true) {
+                                for (var k in eDataList.children) {
+                                    if (eDataList.children[k].id === oJsonParsed[i][j]) {
+                                        return false;
+                                    }
+                                }
+                                eOption.id = oJsonParsed[i][j];
+                                eOption.innerHTML = oJsonParsed[i][j];
+                                eDataList.size = eDataList.children.length;
+                                eDataList.appendChild(eOption);
+                                eOption.addEventListener("click",function (){
+                                    alert(1);
+                               // alert(eInput)
+                               // alert(this.value)
+                                });
+                            }
+                        }
+                    }
+                }
+                eDataList.style.display = "block";
+            }
+            /**createXhrObject maakt het object voor httprequests aan
+             * 
+             * @returns {ActiveXObject|XMLHttpRequest|String}
+             */
             function createXhrObject() {
                 //memoizing
                 var xmlhttp = '';
