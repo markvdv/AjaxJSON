@@ -23,8 +23,10 @@
                     xmlhttpPost("databaseController.php", false);
                 });
                 eInput.addEventListener('keydown', function(e) {
+                    if (e.keyCode == 13) {
+                        console.log('NOOOO, u pressed enter :(');
+                    }
                     xmlhttpPost("databaseController.php", true)
-
                 });
                 //EINDE ONLOAD
 
@@ -37,8 +39,8 @@
              */
             function xmlhttpPost(strURL, bool) {
                 // Mozilla/Safari
-                var xmlhttp = createXhrObject();
-                var eInput = document.getElementById('input');
+                var xmlhttp = createXhrObject(),
+                        eInput = document.getElementById('input');
                 if (eInput.getAttribute("value") !== '') {
                     var sValue = eInput.value
                 }
@@ -46,11 +48,13 @@
                     var sValue = '';
                 }
                 xmlhttp.open('POST', strURL, true);
+                //  xmlhttp.setRequestHeader('Content-Type', 'text/html');
                 xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xmlhttp.onreadystatechange = function() {
                     if (xmlhttp.readyState == 4) {
-                        var sJSON = xmlhttp.responseText,
-                                oJsonParsed = JSON.parse(sJSON, reviver);
+                        var sJSON = xmlhttp.responseText;
+                        console.log(sJSON);
+                        var oJsonParsed = JSON.parse(sJSON, reviver);
                         if (bool === false) {
                             updatepage(oJsonParsed);
                         }
@@ -124,10 +128,10 @@
                                 eOption.innerHTML = oJsonParsed[i][j];
                                 eDataList.size = eDataList.children.length;
                                 eDataList.appendChild(eOption);
-                                eOption.addEventListener("click",function (){
+                                eOption.addEventListener("click", function() {
                                     alert(1);
-                               // alert(eInput)
-                               // alert(this.value)
+                                    // alert(eInput)
+                                    // alert(this.value)
                                 });
                             }
                         }
