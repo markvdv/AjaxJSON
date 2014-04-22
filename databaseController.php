@@ -7,8 +7,8 @@ $productenlijst = ProductService::toonProducten();
 
 //check for user input and encodes of the json string with the data from the db 
 // added JsonSerialize to the entity for proper Json encoding
-if ($_POST['w'] != '') {
-    $productenlijst['query'] = $_POST['w'];
+if ($_GET['w'] != '') {
+    $productenlijst['query'] = $_GET['w'];
 }
 $json = json_encode($productenlijst);
 

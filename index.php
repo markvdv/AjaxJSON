@@ -39,17 +39,19 @@
              */
             function xmlhttpPost(strURL, bool) {
                 // Mozilla/Safari
+               
                 var xmlhttp = createXhrObject(),
                         eInput = document.getElementById('input');
                 if (eInput.getAttribute("value") !== '') {
                     var sValue = eInput.value
+                     strURL+="?w=" + sValue;
                 }
                 else {
                     var sValue = '';
                 }
-                xmlhttp.open('POST', strURL, true);
+                xmlhttp.open('GET', strURL, true);
                 //  xmlhttp.setRequestHeader('Content-Type', 'text/html');
-                xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                //xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xmlhttp.onreadystatechange = function() {
                     if (xmlhttp.readyState == 4) {
                         var sJSON = xmlhttp.responseText;
@@ -63,7 +65,7 @@
                         }
                     }
                 }
-                xmlhttp.send("w=" + sValue);
+                xmlhttp.send();
             }
             /**reviver: function to get the queryparam out and make it a regexp when parsing JSON
              * 
@@ -115,8 +117,6 @@
                         eOption = document.createElement('option');
                 for (var i in oJsonParsed) {
                     for (var j in oJsonParsed[i]) {
-                        alert(i);
-                        alert(j);
                         if (j === "productNaam") {
                             if (typeof eRegExp !== "undefined" && eRegExp.test(oJsonParsed[i][j]) === true) {
                                 for (var k in eDataList.children) {
@@ -129,7 +129,6 @@
                                 eDataList.size = eDataList.children.length;
                                 eDataList.appendChild(eOption);
                                 eOption.addEventListener("click", function() {
-                                    alert(1);
                                     // alert(eInput)
                                     // alert(this.value)
                                 });
